@@ -1,0 +1,62 @@
+stages:
+  - build
+  - test
+  - deploy staging
+  - deploy production
+
+variables:
+  NODE_IMAGE: node:21-alpine
+
+build:
+  image: $NODE_IMAGE
+  stage: build
+  script:
+    - npm ci
+    - npm run lint
+    - npm test
+    - npm run build
+    - echo "$APP_VERSION" > build/version.html
+  artifacts:
+    paths:
+      - build/
+    expire_in: 1 week
+
+test:
+  image: $NODE_IMAGE
+  stage: test
+  script:
+    - npm install -g serve
+    - serve -s build &
+    - sleep 10
+    - curl http://localhost:3000 | grep "React App"
+  dependencies:
+    - build
+
+.deploy:
+  image:
+    name: amazon/aws-cli:2.15.44
+    entrypoint: ['']
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+  before_script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set default.region $AWS_DEFAULT_REGION
+
+deploy_staging:
+  stage: deploy staging
+  environment: staging
+  extends: .deploy
+  script:
+    - aws s3 sync build s3://$AWS_S3_BUCKET --delete
+    - curl $CI_ENVIRONMENT_URL | grep "React App"
+    - curl $CI_ENVIRONMENT_URL/version.html | grep "$APP_VERSION"
+
+deploy_production:
+  stage: deploy production
+  environment: production
+  when: manual
+  extends: .deploy
+  script:
+    - aws s3 sync build s3://$AWS_S3_BUCKET --delete
+    - curl $CI_ENVIRONMENT_URL/version.html | grep "$APP_VERSION"

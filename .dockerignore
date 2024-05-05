@@ -1,0 +1,8 @@
+/Dockerfile
+/.dockerignore
+/package.json
+/...other project files and directories...
+/nginx/default.conf
+/nginx/cache-headers.conf
+/nginx/nocache-headers.conf
+/nginx/security-headers.conf
