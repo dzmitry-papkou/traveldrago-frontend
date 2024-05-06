@@ -19,6 +19,7 @@ build:
     - npm test
     - npm run build
     - echo "$APP_VERSION" > build/version.html
+    - zip -r build.zip build/
   artifacts:
     paths:
       - build/
@@ -56,9 +57,5 @@ deploy_production:
   when: manual
   extends: .deploy
   script:
-      - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-      - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-      - aws configure set default.region $AWS_DEFAULT_REGION
-      - aws s3 cp build/ s3://www.traveldrago.com --recursive
-      - aws elasticbeanstalk create-application-version --application-name $APP_NAME --version-label $CI_COMMIT_REF_SLUG --source-bundle S3Bucket="www.traveldrago.com",S3Key=build
-      - aws elasticbeanstalk update-environment --application-name $APP_NAME --version-label $CI_COMMIT_REF_SLUG --environment-name $APP_ENV_NAME
+    - aws s3 cp build.zip s3://www.traveldrago.com/build.zip
+    - aws elasticbeanstalk update-environment --application-name "TravelDrago-Frontend" --environment-name "TravelDrago-Frontend-env" --version-label $CI_COMMIT_REF_SLUG
