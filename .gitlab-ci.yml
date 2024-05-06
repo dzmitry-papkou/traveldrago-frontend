@@ -1,10 +1,12 @@
 stages:
   - build
+  - package
   - test
   - deploy production
 
 variables:
   NODE_IMAGE: node:21-alpine
+  DOCKER_IMAGE: docker:26.1.1-dind
   APP_NAME: traveldrago
   APP_ENV_NAME: Traveldrago-env
   APP_VERSION: Sample
@@ -13,25 +15,19 @@ cache:
   paths:
     - node_modules/
 
-build:
+build website:
   image: $NODE_IMAGE
   stage: build
   script:
-    - apk add --no-cache zip
-    - npm ci
+    - npm install
     - npm run lint
     - npm test
     - npm run build
-    - echo "$APP_VERSION" > build/version.html
-    - cp Dockerfile build/Dockerfile
-    - cp templates/Dockerrun.aws.json build/Dockerrun.aws.json
-    - cd build
-    - zip -r ../build.zip .
+    - echo $APP_VERSION > build/version.html
   artifacts:
     paths:
-      - build.zip
+      - build/
     expire_in: 1 week
-
 
 test:
   image: $NODE_IMAGE
@@ -42,6 +38,16 @@ test:
     - sleep 10
   dependencies:
     - build
+
+build docker image:
+  image: $DOCKER_IMAGE
+  services:
+    - $DOCKER_IMAGE
+  stage: package
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker build -t $CI_REGISTRY_IMAGE:$APP_VERSION .
+    - docker push $CI_REGISTRY_IMAGE:$APP_VERSION
 
 .deploy:
   image:
@@ -64,7 +70,6 @@ deploy_production:
   script:
     - aws --version
     - yum install -y gettext
-    - aws s3 cp build.zip s3://www.traveldrago.com/build.zip
     - export DEPLOY_TOKEN=$(echo $GITLAB_DEPLOY_TOKEN | tr -d "\n" | base64)
     - envsubst < templates/Dockerrun.aws.json > Dockerrun.aws.json
     - envsubst < templates/auth.json > auth.json
