@@ -15,7 +15,7 @@ cache:
   paths:
     - node_modules/
 
-build website:
+build:
   image: $NODE_IMAGE
   stage: build
   script:
