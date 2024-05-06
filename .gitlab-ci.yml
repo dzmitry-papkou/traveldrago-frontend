@@ -7,7 +7,7 @@ variables:
   NODE_IMAGE: node:21-alpine
   APP_NAME: traveldrago
   APP_ENV_NAME: Traveldrago-env
-  APP_VERSION: $CI_PIPELINE_IID
+  APP_VERSION: Sample
 
 cache:
   paths:
