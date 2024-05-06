@@ -20,7 +20,7 @@ build:
     - npm run build
     - echo "$APP_VERSION" > build/version.html
     - cp Dockerfile build/Dockerfile
-    - cp Dockerrun.aws.json build/Dockerrun.aws.json
+    - cp templates/Dockerrun.aws.json build/Dockerrun.aws.json
     - cd build
     - zip -r ../build.zip .
   artifacts:
@@ -58,7 +58,7 @@ deploy_production:
   when: manual
   extends: .deploy
   script:
-    - aws s3 cp build.zip s3://www.traveldrago.com/build.zip  # Upload the zip file instead of the directory
+    - aws s3 cp build.zip s3://www.traveldrago.com/build.zip
     - VERSION_LABEL="TravelDrago-$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID"
     - aws elasticbeanstalk create-application-version --application-name "TravelDrago-Frontend" --version-label "$VERSION_LABEL" --source-bundle S3Bucket="www.traveldrago.com",S3Key="build.zip"
     - aws elasticbeanstalk update-environment --environment-name "TravelDrago-Frontend-env" --version-label "$VERSION_LABEL"
