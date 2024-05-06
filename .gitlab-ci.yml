@@ -5,6 +5,8 @@ stages:
 
 variables:
   NODE_IMAGE: node:21-alpine
+  APP_NAME: traveldrago
+  APP_ENV_NAME: Traveldrago-env
 
 cache:
   paths:
@@ -60,6 +62,15 @@ deploy_production:
   extends: .deploy
   script:
     - aws s3 cp build.zip s3://www.traveldrago.com/build.zip
-    - VERSION_LABEL="TravelDrago-$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID"
-    - aws elasticbeanstalk create-application-version --application-name "TravelDrago-Frontend" --version-label "$VERSION_LABEL" --source-bundle S3Bucket="www.traveldrago.com",S3Key="build.zip"
-    - aws elasticbeanstalk update-environment --environment-name "TravelDrago-Frontend-env" --version-label "$VERSION_LABEL"
+    - export DEPLOY_TOKEN=$(echo $GITLAB_DEPLOY_TOKEN | tr -d "\n" | base64)
+    - envsubst < templates/Dockerrun.aws.json > Dockerrun.aws.json
+    - envsubst < templates/auth.json > auth.json
+    - cat Dockerrun.aws.json
+    - cat auth.json
+    - aws s3 cp Dockerrun.aws.json s3://$AWS_S3_BUCKET_PRODUCTION/Dockerrun.aws.json
+    - aws s3 cp auth.json s3://$AWS_S3_BUCKET_PRODUCTION/auth.json
+    - aws elasticbeanstalk create-application-version --application-name "$APP_NAME" --version-label $APP_VERSION --source-bundle S3Bucket=$AWS_S3_BUCKET_PRODUCTION,S3Key=Dockerrun.aws.json
+    - aws elasticbeanstalk update-environment --application-name "$APP_NAME" --version-label $APP_VERSION --environment-name $APP_ENV_NAME
+    - aws elasticbeanstalk wait environment-updated --application-name "$APP_NAME" --version-label $APP_VERSION --environment-name $APP_ENV_NAME
+    - curl $CI_ENVIRONMENT_URL/version.html | grep $APP_VERSION
+
