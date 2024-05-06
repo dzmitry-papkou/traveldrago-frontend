@@ -1,7 +1,6 @@
 stages:
   - build
   - test
-  - deploy staging
   - deploy production
 
 variables:
@@ -46,7 +45,7 @@ test:
     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - aws configure set default.region $AWS_DEFAULT_REGION
 
-deploy_production:
+deploy production:
   stage: deploy
   variables:
     APP_NAME: TravelDrago-Frontend
