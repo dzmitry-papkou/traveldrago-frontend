@@ -4,7 +4,7 @@
         "Name": "$CI_REGISTRY_IMAGE:$APP_VERSION"
     },
     "Authentication": {
-        "Bucket": "$AWS_S3_BUCKET",
+        "Bucket": "$AWS_S3_BUCKET_PRODUCTION",
         "Key": "auth.json"
     },
     "Ports": [

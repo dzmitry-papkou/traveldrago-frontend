@@ -47,12 +47,19 @@ test:
     - aws configure set default.region $AWS_DEFAULT_REGION
 
 deploy_production:
-  stage: deploy production
+  stage: deploy
+  variables:
+    APP_NAME: TravelDrago-Frontend
+    APP_ENV_NAME: TravelDrago-Frontend-env
   environment:
     name: production
     url: https://www.traveldrago.com
   when: manual
   extends: .deploy
   script:
-    - aws s3 sync build/ s3://$AWS_S3_BUCKET_PRODUCTION --delete
-    - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
+      - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+      - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      - aws configure set default.region $AWS_DEFAULT_REGION
+      - aws s3 cp build/ s3://www.traveldrago.com --recursive
+      - aws elasticbeanstalk create-application-version --application-name $APP_NAME --version-label $CI_COMMIT_REF_SLUG --source-bundle S3Bucket="www.traveldrago.com",S3Key=build
+      - aws elasticbeanstalk update-environment --application-name $APP_NAME --version-label $CI_COMMIT_REF_SLUG --environment-name $APP_ENV_NAME
