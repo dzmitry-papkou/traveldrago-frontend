@@ -19,7 +19,6 @@ build:
     - npm test
     - npm run build
     - echo "$APP_VERSION" > build/version.html
-    - zip -r build.zip build/
   artifacts:
     paths:
       - build/
@@ -57,5 +56,5 @@ deploy_production:
   when: manual
   extends: .deploy
   script:
-    - aws s3 cp build.zip s3://www.traveldrago.com/build.zip
-    - aws elasticbeanstalk update-environment --application-name "TravelDrago-Frontend" --environment-name "TravelDrago-Frontend-env" --version-label $CI_COMMIT_REF_SLUG
+      - aws s3 cp build/ s3://www.traveldrago.com --recursive
+      - aws elasticbeanstalk update-environment --application-name "TravelDrago-Frontend" --environment-name "TravelDrago-Frontend-env" --version-label $CI_COMMIT_REF_SLUG
