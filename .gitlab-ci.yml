@@ -9,7 +9,7 @@ variables:
   DOCKER_IMAGE: docker:26.1.1-dind
   APP_NAME: traveldrago
   APP_ENV_NAME: Traveldrago-env
-  APP_VERSION: Sample
+  APP_VERSION: $CI_PIPELINE_IID
 
 cache:
   paths:
