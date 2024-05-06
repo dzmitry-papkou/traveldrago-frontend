@@ -14,18 +14,20 @@ build:
   image: $NODE_IMAGE
   stage: build
   script:
-    - apk add --no-cache zip
     - npm ci
     - npm run lint
     - npm test
     - npm run build
     - echo "$APP_VERSION" > build/version.html
-    - zip -r build.zip build/
+    - cp Dockerfile build/Dockerfile
+    - cp Dockerrun.aws.json build/Dockerrun.aws.json
+    - cd build
+    - zip -r ../build.zip .
   artifacts:
     paths:
-      - build/
       - build.zip
     expire_in: 1 week
+
 
 test:
   image: $NODE_IMAGE
