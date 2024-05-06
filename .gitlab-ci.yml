@@ -47,14 +47,11 @@ test:
 
 deploy_production:
   stage: deploy production
-  variables:
-    APP_NAME: TravelDrago-Frontend
-    APP_ENV_NAME: TravelDrago-Frontend-env
   environment:
     name: production
     url: https://www.traveldrago.com
   when: manual
   extends: .deploy
   script:
-      - aws s3 cp build/ s3://www.traveldrago.com --recursive
-      - aws elasticbeanstalk update-environment --application-name "TravelDrago-Frontend" --environment-name "TravelDrago-Frontend-env" --version-label $CI_COMMIT_REF_SLUG
+    - aws s3 cp build/ s3://www.traveldrago.com --recursive
+    - aws elasticbeanstalk restart-app-server --environment-name "TravelDrago-Frontend-env"
