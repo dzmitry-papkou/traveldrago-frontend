@@ -54,4 +54,6 @@ deploy_production:
   extends: .deploy
   script:
     - aws s3 cp build/ s3://www.traveldrago.com --recursive
-    - aws elasticbeanstalk restart-app-server --environment-name "TravelDrago-Frontend-env"
+    - VERSION_LABEL="TravelDrago-$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID"
+    - aws elasticbeanstalk create-application-version --application-name "TravelDrago-Frontend" --version-label "$VERSION_LABEL" --source-bundle S3Bucket="www.traveldrago.com",S3Key="build.zip"
+    - aws elasticbeanstalk update-environment --environment-name "TravelDrago-Frontend-env" --version-label "$VERSION_LABEL"
