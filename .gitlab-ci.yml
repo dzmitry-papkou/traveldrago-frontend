@@ -7,6 +7,10 @@ stages:
 variables:
   NODE_IMAGE: node:21-alpine
 
+cache:
+  paths:
+    - node_modules/
+
 build:
   image: $NODE_IMAGE
   stage: build
@@ -42,17 +46,13 @@ test:
     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - aws configure set default.region $AWS_DEFAULT_REGION
 
-deploy_staging:
-  stage: deploy staging
-  environment: staging
-  extends: .deploy
-  script:
-    - aws s3 sync build s3://$AWS_S3_BUCKET --delete
-
 deploy_production:
   stage: deploy production
-  environment: production
+  environment:
+    name: production
+    url: https://www.traveldrago.com
   when: manual
   extends: .deploy
   script:
-    - aws s3 sync build s3://$AWS_S3_BUCKET --delete
+    - aws s3 sync build/ s3://$AWS_S3_BUCKET_PRODUCTION --delete
+    - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
