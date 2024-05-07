@@ -8,7 +8,7 @@ variables:
   NODE_IMAGE: node:21-alpine
   DOCKER_IMAGE: docker:26.1.1-dind
   APP_NAME: travel-drago
-  APP_ENV_NAME: Travel-drago-prod
+  APP_ENV_NAME: Travel-drago-env
   APP_VERSION: ${CI_COMMIT_SHORT_SHA}_${CI_PIPELINE_IID}
 
 cache:
