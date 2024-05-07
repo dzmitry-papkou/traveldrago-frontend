@@ -56,7 +56,6 @@ build docker image:
   rules:
     - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
   before_script:
-    - apt-get update && apt-get install -y gettext-base
     - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - aws configure set default.region $AWS_DEFAULT_REGION
@@ -70,6 +69,7 @@ deploy_production:
   extends: .deploy
   script:
     - aws --version
+    - yum install -y gettext
     - export DEPLOY_TOKEN=$(echo $GITLAB_DEPLOY_TOKEN | tr -d "\n" | base64)
     - envsubst < templates/Dockerrun.aws.json > Dockerrun.aws.json
     - envsubst < templates/auth.json > auth.json
