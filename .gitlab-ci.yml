@@ -7,8 +7,8 @@ stages:
 variables:
   NODE_IMAGE: node:21-alpine
   DOCKER_IMAGE: docker:26.1.1-dind
-  APP_NAME: tdrago-www
-  APP_ENV_NAME: Tdrago-www-env
+  APP_NAME: traveldrago-web
+  APP_ENV_NAME: Traveldrago-web-env
   APP_VERSION: ${CI_COMMIT_SHORT_SHA}_${CI_PIPELINE_IID}
 
 cache:
