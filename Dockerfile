@@ -7,9 +7,10 @@ RUN npm run build
 
 FROM nginx:1.25.4-alpine
 
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
-COPY nginx/cache-headers.conf /etc/nginx/conf.d/cache-headers.conf
-COPY nginx/nocache-headers.conf /etc/nginx/conf.d/nocache-headers.conf
-COPY nginx/security-headers.conf /etc/nginx/conf.d/security-headers.conf
+RUN rm /etc/nginx/nginx.conf
+
+COPY .ebextensions/nginx.conf /etc/nginx/nginx.conf
 
 COPY --from=builder /code/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
