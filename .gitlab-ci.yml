@@ -97,6 +97,6 @@ deploy_production:
     - aws --version
     - yum install -y gettext
     - echo "Deploying $APP_NAME version $APP_VERSION to $APP_ENV_NAME"
-    - aws s3 cp deploy_package.zip s3://$EB_BUCKET_NAME/$APP_NAME-$APP_VERSION.zip
-    - aws elasticbeanstalk create-application-version --application-name "$APP_NAME" --version-label $APP_VERSION --source-bundle S3Bucket=$EB_BUCKET_NAME,S3Key=$APP_NAME-$APP_VERSION.zip
+    - aws s3 cp deploy_package.zip s3://$AWS_S3_BUCKET_PRODUCTION/$APP_NAME-$APP_VERSION.zip
+    - aws elasticbeanstalk create-application-version --application-name "$APP_NAME" --version-label $APP_VERSION --source-bundle S3Bucket=$AWS_S3_BUCKET_PRODUCTION,S3Key=$APP_NAME-$APP_VERSION.zip
     - aws elasticbeanstalk update-environment --application-name $APP_NAME --version-label $APP_VERSION --environment-name $APP_ENV_NAME
