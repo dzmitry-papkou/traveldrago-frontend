@@ -4,6 +4,7 @@ import { ROUTE_PATHS } from '../../constants/routePaths';
 import Loader from '../shared/Loader';
 
 const Home = lazy(() => import('../../pages/home/Home'));
+const GalleryPage = lazy(() => import('../../pages/GalleryPage'));
 
 const CustomRouterProvider: FC = () => {
   const router = createBrowserRouter([
@@ -20,6 +21,14 @@ const CustomRouterProvider: FC = () => {
         },
       ],
     },
+    {
+      path: ROUTE_PATHS.GALLERY,
+      element: (
+        <Suspense fallback={<Loader />}>
+          <GalleryPage />
+        </Suspense>
+      ),
+    }
   ]);
 
   return (

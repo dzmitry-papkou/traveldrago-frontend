@@ -1,11 +1,8 @@
 variables:
   NODE_IMAGE: node:21-alpine
-  DOCKER_IMAGE: docker:26.1.1-dind
-  APP_NAME: traveldrago-web
-  APP_ENV_NAME: Traveldrago-web-env
-  APP_VERSION: ${CI_COMMIT_SHORT_SHA}_${CI_PIPELINE_IID}
-  ECR_REPOSITORY_URI: 730335238619.dkr.ecr.eu-north-1.amazonaws.com/traveldrago-web
   AWS_DEFAULT_REGION: eu-north-1
+  S3_BUCKET: www.traveldrago.com
+  CLOUD_FRONT_DISTRIBUTION_ID: EU017TT31UHLN
 
 cache:
   paths:
@@ -14,8 +11,6 @@ cache:
 stages:
   - build
   - test
-  - package
-  - push
   - deploy
 
 build:
@@ -26,7 +21,7 @@ build:
     - npm run lint
     - npm test
     - npm run build
-    - echo $APP_VERSION > build/version.html
+    - echo $CI_COMMIT_SHORT_SHA > build/version.txt
   artifacts:
     paths:
       - build/
@@ -42,61 +37,17 @@ test:
   dependencies:
     - build
 
-package:
-  image: $DOCKER_IMAGE
-  services:
-    - $DOCKER_IMAGE
-  stage: package
-  script:
-    - apk add --no-cache zip jq
-    - jq '.Image.Name = "'$ECR_REPOSITORY_URI:$APP_VERSION'"' Dockerrun.aws.json > Dockerrun.aws.json.tmp && mv Dockerrun.aws.json.tmp Dockerrun.aws.json
-    - zip -r deploy_package.zip build/ .platform/ .ebextensions/ Dockerrun.aws.json
-  artifacts:
-    paths:
-      - deploy_package.zip
-    expire_in: 1 week
-
-push:
-  image: $DOCKER_IMAGE
-  services:
-    - name: docker:dind
-  stage: push
-  before_script:
-    - apk update
-    - apk add --no-cache python3 py3-pip curl
-    - python3 -m venv venv
-    - source venv/bin/activate
-    - pip install --upgrade pip
-    - pip install awscli
-    - aws --version
-    - docker --version
-  script:
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    - aws configure set default.region $AWS_DEFAULT_REGION
-    - |
-      echo "$(aws ecr get-login-password --region $AWS_DEFAULT_REGION)" | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
-    - docker build -t $ECR_REPOSITORY_URI:$APP_VERSION --build-arg CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE --build-arg APP_VERSION=$APP_VERSION .
-    - docker push $ECR_REPOSITORY_URI:$APP_VERSION
-
-deploy_production:
-  image:
-    name: amazon/aws-cli:2.15.44
-    entrypoint: ['']
+deploy:
+  image: amazon/aws-cli:2.15.44
   stage: deploy
+  script:
+    - echo "Deploying to S3..."
+    - aws s3 sync build/ s3://$S3_BUCKET --delete
+    - echo "Invalidating CloudFront cache..."
+    - aws cloudfront create-invalidation --distribution-id $CLOUD_FRONT_DISTRIBUTION_ID --paths "/*"
   environment:
     name: production
     url: https://www.traveldrago.com
   when: manual
-  dependencies:
-    - package
-  script:
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    - aws configure set default.region $AWS_DEFAULT_REGION
-    - aws --version
-    - yum install -y gettext
-    - echo "Deploying $APP_NAME version $APP_VERSION to $APP_ENV_NAME"
-    - aws s3 cp deploy_package.zip s3://$AWS_S3_BUCKET_PRODUCTION/$APP_NAME-$APP_VERSION.zip
-    - aws elasticbeanstalk create-application-version --application-name "$APP_NAME" --version-label $APP_VERSION --source-bundle S3Bucket=$AWS_S3_BUCKET_PRODUCTION,S3Key=$APP_NAME-$APP_VERSION.zip
-    - aws elasticbeanstalk update-environment --application-name $APP_NAME --version-label $APP_VERSION --environment-name $APP_ENV_NAME
+  only:
+    - main
