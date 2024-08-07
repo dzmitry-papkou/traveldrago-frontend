@@ -1,5 +1,10 @@
 variables:
   NODE_IMAGE: node:21-alpine
+  DOCKER_IMAGE: docker:26.1.1-dind
+  APP_NAME: traveldrago-web
+  APP_ENV_NAME: Traveldrago-web-env
+  APP_VERSION: ${CI_COMMIT_SHORT_SHA}_${CI_PIPELINE_IID}
+  ECR_REPOSITORY_URI: 730335238619.dkr.ecr.eu-north-1.amazonaws.com/traveldrago-web
   AWS_DEFAULT_REGION: eu-north-1
   S3_BUCKET: www.traveldrago.com
   CLOUD_FRONT_DISTRIBUTION_ID: EU017TT31UHLN
