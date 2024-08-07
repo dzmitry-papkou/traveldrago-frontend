@@ -49,7 +49,7 @@ deploy:
     - echo "Deploying to S3..."
     - aws s3 sync build/ s3://$S3_BUCKET --delete
     - echo "Invalidating CloudFront cache..."
-    - aws cloudfront create-invalidation --distribution-id $CLOUD_FRONT_DISTRIBUTION_ID --paths "/*"
+    # - aws cloudfront create-invalidation --distribution-id $CLOUD_FRONT_DISTRIBUTION_ID --paths "/*"
   environment:
     name: production
     url: https://www.traveldrago.com
