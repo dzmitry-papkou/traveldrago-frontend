@@ -7,7 +7,7 @@ import TicketsLeftDisplay from '../../components/tickets/TicketsLeftDisplay';
 export default function Home() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header title="Travel Drago" />
+      <Header title="Travel6 Drago" />
       {/* <EchoComponent /> */}
       <TicketsLeftDisplay />
       <EchoComponent />
