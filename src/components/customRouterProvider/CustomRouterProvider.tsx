@@ -2,6 +2,7 @@ import { Suspense, FC, lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ROUTE_PATHS } from '../../constants/routePaths';
 import Loader from '../shared/Loader';
+import EchoComponent from '../echo/EchoComponent';
 
 const Home = lazy(() => import('../../pages/home/Home'));
 const GalleryPage = lazy(() => import('../../pages/GalleryPage'));
@@ -28,6 +29,14 @@ const CustomRouterProvider: FC = () => {
           <GalleryPage />
         </Suspense>
       ),
+    },
+    {
+      path: ROUTE_PATHS.ECHO,
+      element: (
+        <Suspense fallback={<Loader />}>
+          < EchoComponent />
+        </Suspense>
+      )
     }
   ]);
 
