@@ -26,26 +26,6 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                     Home
                 </Link>
                 <Link
-                    href="#about"
-                    color="inherit"
-                    style={{
-                        margin: 8,
-                        textDecoration: 'none',
-                    }}
-                >
-                    About
-                </Link>
-                <Link
-                    href="#aboutus"
-                    color="inherit"
-                    style={{
-                        margin: 8,
-                        textDecoration: 'none',
-                    }}
-                >
-                    About us
-                </Link>
-                <Link
                     href="/gallery"
                     color="inherit"
                     style={{
@@ -54,6 +34,26 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                     }}
                 >
                     Contacts
+                </Link>
+                <Link
+                    href="/login"
+                    color="inherit"
+                    style={{
+                        margin: 8,
+                        textDecoration: 'none',
+                    }}
+                >
+                    Login
+                </Link>
+                <Link
+                    href="/signup"
+                    color="inherit"
+                    style={{
+                        margin: 8,
+                        textDecoration: 'none',
+                    }}
+                >
+                    Sign Up
                 </Link>
             </Toolbar>
         </AppBar>

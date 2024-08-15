@@ -6,6 +6,8 @@ import EchoComponent from '../echo/EchoComponent';
 
 const Home = lazy(() => import('../../pages/home/Home'));
 const GalleryPage = lazy(() => import('../../pages/GalleryPage'));
+const Login = lazy(() => import('../login/Login')); // Import the Login component
+const Signup = lazy(() => import('../login/Signup')); // Import the Signup component
 
 const CustomRouterProvider: FC = () => {
   const router = createBrowserRouter([
