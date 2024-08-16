@@ -1,8 +1,22 @@
 body {
   font-family: 'Inter';
-  color: #000048;
+  color: rgb(255, 255, 255);
+  margin: 0;
+  padding: 0;
 }
 
 .PageContainer {
   padding: 40px;
+  position: relative;
+  z-index: 3; /* Ensure content stays above the background tint */
 }
+
+.app-background {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
