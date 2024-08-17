@@ -4,7 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme'; // Import your custom theme
 import CustomRouterProvider from './components/customRouterProvider';
 import './index.css'; // Import your global CSS
-import { UserProvider } from './context/UserContext'; // Import the UserProvider
+import { UserProvider } from '../src/context/UserContext'; // Import the UserProvider
 
 function App() {
   return (

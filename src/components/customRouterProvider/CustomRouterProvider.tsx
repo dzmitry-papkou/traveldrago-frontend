@@ -8,7 +8,7 @@ const Home = lazy(() => import('../../pages/home/Home'));  // Adjusted import
 const GalleryPage = lazy(() => import('../../pages/GalleryPage'));  // Adjusted import
 const Login = lazy(() => import('../login/Login'));  // Adjusted import
 const Signup = lazy(() => import('../login/Signup'));  // Adjusted import
-const TicketInfoPage = lazy(() => import('../../pages/tickets/TicketsInfoPage'));  // Adjusted import
+// const TicketInfoPage = lazy(() => import('../../pages/tickets/TicketsInfoPage'));  // Adjusted import
 
 const CustomRouterProvider: FC = () => {
   const router = createBrowserRouter([
@@ -52,14 +52,14 @@ const CustomRouterProvider: FC = () => {
         </Suspense>
       ),
     },
-    {
-      path: ROUTE_PATHS.TICKET_INFO,  // Add this new route
-      element: (
-        <Suspense fallback={<Loader />}>
-          <TicketInfoPage />
-        </Suspense>
-      ),
-    }
+    // {
+    //   path: ROUTE_PATHS.TICKET_INFO,  // Add this new route
+    //   element: (
+    //     <Suspense fallback={<Loader />}>
+    //       <TicketInfoPage />
+    //     </Suspense>
+    //   ),
+    // }
   ]);
 
   return (
