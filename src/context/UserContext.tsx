@@ -27,16 +27,15 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(JSON.parse(localStorage.getItem('user') || 'null'));
 
     const login = (userData: User) => {
-        localStorage.setItem('user', JSON.stringify(userData)); // Store user data in local storage
+        localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
     };
 
     const logout = () => {
-        localStorage.removeItem('user'); // Remove user data from local storage
+        localStorage.removeItem('user');
         setUser(null);
     };
 
-    // Handle case where the user might still have a token stored but the context is lost on refresh or navigation
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
@@ -51,4 +50,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     );
 };
 
-export default { useUser, UserProvider };
+// Correct way to export if using default export for an object
+const UserExports = { useUser, UserProvider };
+export default UserExports;
