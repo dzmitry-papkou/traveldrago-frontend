@@ -1,4 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { ENDPOINTS } from "../constants/endpoints";
+import { HTTP_METHODS } from "../constants/http";
 
 export type ErrorResponse = {
     status: number;
@@ -22,8 +24,6 @@ export type ApiResponse<T> = {
     status: number;
 }
 
-const BASE_URL = "http://localhost:8080/api/v1/";  // Assuming this is the correct base URL for your backend.
-
 const getErrorMessages = (error: AxiosError): string => {
     if(!error.response) {
         return 'Network Error';
@@ -46,14 +46,14 @@ const makeRequestAsync = async <T>({
     queryParams,
     body,
 } : RequestParams): Promise<ApiResponse<T> | ErrorResponse> => {
+
     const request: AxiosRequestConfig = {
-        url: `${BASE_URL}${url}`,
-        method: httpMethod as any,
+        url,
+        method: httpMethod,
         params: queryParams,
         data: body,
         headers: {
             'Content-Type': 'application/json',
-            // Additional headers can be added here
         },
     };
 
@@ -71,8 +71,8 @@ const makeRequestAsync = async <T>({
 // Function to handle user login
 const loginUser = async (username: string, password: string): Promise<ApiResponse<{ token: string }> | ErrorResponse> => {
     return makeRequestAsync<{ token: string }>({
-        url: 'login',
-        httpMethod: 'POST',
+        url: ENDPOINTS.ECHO.GET_ONE,
+        httpMethod: HTTP_METHODS.GET,
         body: { username, password }
     });
 };
@@ -84,3 +84,4 @@ const apiService = {
 };
 
 export default apiService;
+
