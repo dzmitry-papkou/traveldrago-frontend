@@ -3,7 +3,7 @@ import EchoComponent from '../../components/echo/EchoComponent';
 import Footer from '../../components/footer/Footer';
 import Header from '../../components/header/Header';
 //import TicketsLeftDisplay from '../../components/tickets/TicketsLeftDisplay';
-import MainSection from './MainSection';
+import MainSection from '../../components/mainSection/MainSection';
 
 export default function Home() {
   return (

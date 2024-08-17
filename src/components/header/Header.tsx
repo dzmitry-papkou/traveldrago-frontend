@@ -1,83 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import Button from '@mui/material/Button'; // Import Button from Material-UI
-import { useUser } from '../../context/UserContext'; // Adjust path and use useUser for safety
+import { useUser } from '../../context/UserContext';
+import UserSidebar from '../sidebar/UserSidebar';
 
 interface HeaderProps {
     title: string;
 }
 
 const Header: React.FC<HeaderProps> = ({ title }) => {
-    const { user, logout } = useUser(); // Use useUser hook to get user and logout method
+    const { user } = useUser();
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+    const handleSidebarToggle = () => {
+        setSidebarOpen(!isSidebarOpen);
+    };
 
     return (
-        <AppBar position="static">
-            <Toolbar>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                    {title}
-                </Typography>
-                <Link
-                    href="/"
-                    color="inherit"
-                    style={{
-                        margin: 8,
-                        textDecoration: 'none',
-                    }}
-                >
-                    Home
-                </Link>
-                <Link
-                    href="/gallery"
-                    color="inherit"
-                    style={{
-                        margin: 8,
-                        textDecoration: 'none',
-                    }}
-                >
-                    Contacts
-                </Link>
-                {user ? (
-                    <>
-                        <Typography component="p" style={{ margin: 8 }}>
+        <>
+            <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                <Toolbar>
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                        {title}
+                    </Typography>
+                    <Link href="/" color="inherit" sx={{ marginRight: '8px', textDecoration: 'none' }}>
+                        Home
+                    </Link>
+                    <Link href="/gallery" color="inherit" sx={{ marginRight: '8px', textDecoration: 'none' }}>
+                        Contacts
+                    </Link>
+                    {user ? (
+                        <Typography component="p" sx={{ marginRight: '8px', cursor: 'pointer' }} onClick={handleSidebarToggle}>
                             Welcome, {user.username}
                         </Typography>
-                        <Button
-                            onClick={logout} // Use logout function
-                            color="inherit"
-                            style={{ margin: 8 }}
-                        >
-                            Logout
-                        </Button>
-                    </>
-                ) : (
-                    <>
-                        <Link
-                            href="/login"
-                            color="inherit"
-                            style={{
-                                margin: 8,
-                                textDecoration: 'none',
-                            }}
-                        >
-                            Login
-                        </Link>
-                        <Link
-                            href="/signup"
-                            color="inherit"
-                            style={{
-                                margin: 8,
-                                textDecoration: 'none',
-                            }}
-                        >
-                            Sign Up
-                        </Link>
-                    </>
-                )}
-            </Toolbar>
-        </AppBar>
+                    ) : (
+                        <>
+                            <Link href="/login" color="inherit" sx={{ marginRight: '8px', textDecoration: 'none' }}>
+                                Login
+                            </Link>
+                            <Link href="/signup" color="inherit" sx={{ marginRight: '8px', textDecoration: 'none' }}>
+                                Sign Up
+                            </Link>
+                        </>
+                    )}
+                </Toolbar>
+            </AppBar>
+            <Toolbar /> {/* Padding to ensure content is not hidden under the fixed AppBar */}
+            <UserSidebar open={isSidebarOpen} onClose={handleSidebarToggle} />
+        </>
     );
 };
 

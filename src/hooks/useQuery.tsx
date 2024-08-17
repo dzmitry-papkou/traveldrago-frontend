@@ -30,7 +30,6 @@ export default function useQuery<T>({
 
   const getData = async () => {
     setIsLoading(true);
-
     try {
       const response = await apiService.makeRequestAsync<T>({
         url,
@@ -62,9 +61,11 @@ export default function useQuery<T>({
         body: sanitizedValues,
         httpMethod: httpMethod || HTTP_METHODS.POST,
       });
+
       if ('message' in response) {
         setErrors([response.message]);
       } else {
+        setData(response.data);
         onSuccess(response.data);
         return response;
       }
