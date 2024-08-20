@@ -1,14 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import apiService from '../services/apiService';
+import { ENDPOINTS } from '../constants/endpoints';
 
 interface User {
     username: string;
+    email: string; // Add email to the User interface
     token: string;
 }
 
 interface UserContextType {
     user: User | null;
     login: (userData: User) => void;
-    logout: () => void;
+    logout: () => Promise<void>;
+    refreshUserData: () => Promise<void>; // Method to refresh user data
+    updateUser: (updatedData: Partial<User>) => void; // Method to update user data
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -31,9 +36,37 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         setUser(userData);
     };
 
-    const logout = () => {
-        localStorage.removeItem('user');
-        setUser(null);
+    const logout = (): Promise<void> => {
+        return new Promise((resolve) => {
+            localStorage.removeItem('user');
+            setUser(null);
+            resolve();
+        });
+    };
+
+    const refreshUserData = async (): Promise<void> => {
+        if (!user) return;
+        try {
+            const response = await apiService.makeRequestAsync<User>({
+                url: ENDPOINTS.USER_INFO,
+                httpMethod: 'GET',
+                authToken: user.token,
+            });
+            if ('data' in response) {
+                const updatedUser = { ...user, ...response.data }; // Merge the new data with existing user data
+                localStorage.setItem('user', JSON.stringify(updatedUser)); // Update local storage
+                setUser(updatedUser);
+            }
+        } catch (error) {
+            console.error("Failed to refresh user data", error);
+        }
+    };
+
+    const updateUser = (updatedData: Partial<User>) => {
+        if (!user) return;
+        const updatedUser = { ...user, ...updatedData };
+        localStorage.setItem('user', JSON.stringify(updatedUser)); // Update local storage
+        setUser(updatedUser);
     };
 
     useEffect(() => {
@@ -44,7 +77,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, login, logout }}>
+        <UserContext.Provider value={{ user, login, logout, refreshUserData, updateUser }}>
             {children}
         </UserContext.Provider>
     );

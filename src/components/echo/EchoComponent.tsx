@@ -19,7 +19,7 @@ const EchoComponent = () => {
 
     useEffect(() => {
         getData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (isLoading) return <Loader />;

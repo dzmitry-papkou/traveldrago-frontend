@@ -37,9 +37,9 @@ export const filterTickets = (
     const addConnectingFlight = (city: string) => {
         const connectingFlight = mockTickets.find(ticket => {
             return ticket.startCity === currentCity &&
-                   ticket.endCity === city &&
-                   !excludeCities.includes(ticket.endCity) &&
-                   isTicketWithinDateRange(ticket.startDate, ticket.endDate);
+                ticket.endCity === city &&
+                !excludeCities.includes(ticket.endCity) &&
+                isTicketWithinDateRange(ticket.startDate, ticket.endDate);
         });
 
         if (connectingFlight) {

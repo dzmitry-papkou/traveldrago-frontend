@@ -17,6 +17,7 @@ type RequestParams = {
     httpMethod: string;
     queryParams?: Query;
     body?: any;
+    authToken?: string; // Add authToken to RequestParams
 }
 
 export type ApiResponse<T> = {
@@ -25,17 +26,22 @@ export type ApiResponse<T> = {
 }
 
 const getErrorMessages = (error: AxiosError): string => {
-    if(!error.response) {
+    if (!error.response) {
         return 'Network Error';
     }
 
-    return error.message;
+    // Extract the detailed error message from the API response if available
+    if (error.response.data && typeof error.response.data === 'string') {
+        return error.response.data; // This would be "Error registering user: Already exists"
+    }
+
+    return error.message || 'An unknown error occurred';
 };
 
 const createErrorResponse = (error: AxiosError): ErrorResponse => {
     return {
         status: error.response?.status || 500,
-        message: getErrorMessages(error),
+        message: getErrorMessages(error),  // This will include the detailed message
         exception: error
     };
 };
@@ -45,7 +51,8 @@ const makeRequestAsync = async <T>({
     httpMethod,
     queryParams,
     body,
-} : RequestParams): Promise<ApiResponse<T> | ErrorResponse> => {
+    authToken,  // Include the authToken parameter
+}: RequestParams): Promise<ApiResponse<T> | ErrorResponse> => {
 
     const request: AxiosRequestConfig = {
         url,
@@ -54,6 +61,7 @@ const makeRequestAsync = async <T>({
         data: body,
         headers: {
             'Content-Type': 'application/json',
+            ...(authToken && { 'Authorization': `Bearer ${authToken}` }),  // Include the token if available
         },
     };
 
@@ -84,4 +92,3 @@ const apiService = {
 };
 
 export default apiService;
-

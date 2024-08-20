@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         <>
             <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
                 <Toolbar>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    <Typography variant="h3" component="div" sx={{ flexGrow: 1 }}>
                         {title}
                     </Typography>
                     <Link href="/" color="inherit" sx={{ marginRight: '8px', textDecoration: 'none' }}>

@@ -4,5 +4,7 @@ export const ROUTE_PATHS = {
     ECHO: '/echo',
     LOGIN: '/login',
     SIGNUP: '/signup',
-    TICKET_INFO: '/trip'
+    TICKET_INFO: '/trip',
+    CONFIRMATION_CODE: '/confirmation-code',
+    ACCOUNT_SETTINGS: '/account-settings'
 }
