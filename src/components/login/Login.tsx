@@ -13,9 +13,13 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [inputErrors, setInputErrors] = useState<{ username?: string; password?: string }>({});
-  const { data, isLoading, errors, sendData } = useQuery<{ success: boolean; accessToken: string }>({
+  const { data, isLoading, errors, sendData } = useQuery<{
+    success: boolean;
+    accessToken: string;
+    idToken: string;
+  }>({
     url: ENDPOINTS.LOGIN.POST,
-    httpMethod: HTTP_METHODS.POST
+    httpMethod: HTTP_METHODS.POST,
   });
   const navigate = useNavigate();
   const { login, refreshUserData } = useUser();
@@ -25,13 +29,13 @@ const Login: React.FC = () => {
       console.log('Received data from API:', data);
 
       if (data.success) {
-        console.log('Login successful, setting user context');
-        login({ username, token: data.accessToken, email: '' }); // Temporary login without email
+        // Save both accessToken and idToken
+        login({ username, token: data.accessToken, email: '', idToken: data.idToken });
         refreshUserData().then(() => {
           navigate('/');
         });
       } else {
-        setErrorMessage('Login failed. Please try again.');
+        setErrorMessage('Login failed. Please check your credentials.');
         setInputErrors({ username: '', password: '' });
       }
     }
@@ -58,13 +62,11 @@ const Login: React.FC = () => {
     if (!username.trim()) {
       newErrors.username = 'Username is required';
       isValid = false;
-      console.warn('Username is required');
     }
 
     if (!password.trim()) {
       newErrors.password = 'Password is required';
       isValid = false;
-      console.warn('Password is required');
     }
 
     if (!isValid) {
@@ -75,12 +77,11 @@ const Login: React.FC = () => {
     console.log('Sending login data:', { username, password });
     sendData({ username, password }) // Only trigger API call here
       .then(response => {
-        console.log('Login API response:', response);
+        if (response && 'exception' in response) {
+          setErrorMessage('Invalid credentials.');
+        }
       })
-      .catch(error => {
-        console.error('Login API error:', error);
-      });
-    setInputErrors({});
+      .catch(() => setErrorMessage('An error occurred during login.'));
   };
 
   return (

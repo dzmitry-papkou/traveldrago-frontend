@@ -11,6 +11,7 @@ type UseQueryArguments<T> = {
   id?: number;
   mapper?: (data: any) => T;
   onSuccess?: (data: T) => void;
+  includeTokenInBody?: boolean;
 };
 
 export default function useQuery<T>({
@@ -19,13 +20,14 @@ export default function useQuery<T>({
   httpMethod,
   queryParams,
   mapper = data => data as T,
-  onSuccess = () => { },
+  onSuccess = () => {},
+  includeTokenInBody = false,
 }: UseQueryArguments<T>) {
   if (!url) {
     throw new Error('URL is required');
   }
 
-  const { user } = useUser();  // Get the user token from context
+  const { user } = useUser();
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<string[] | null>(null);
@@ -37,7 +39,7 @@ export default function useQuery<T>({
         url,
         httpMethod: HTTP_METHODS.GET,
         queryParams,
-        authToken: user?.token,
+        authToken: user?.token, // Use accessToken for GET requests
       });
 
       if ((response as ErrorResponse).exception) {
@@ -54,7 +56,7 @@ export default function useQuery<T>({
     }
   };
 
-  const sendData = async (values?: Query, method?: string, customUrl?: string) => {
+  const sendData = async (values?: Query, method?: string, customUrl?: string, authToken?: string) => {
     setIsLoading(true);
     const sanitizedValues = values ? queryService.sanitize(values) : undefined;
     try {
@@ -63,7 +65,8 @@ export default function useQuery<T>({
         queryParams: id ? { id } : undefined,
         body: sanitizedValues,
         httpMethod: method || httpMethod || HTTP_METHODS.POST,
-        authToken: user?.token,
+        authToken: authToken || user?.token,
+        includeTokenInBody,
       });
 
       if ((response as ErrorResponse).exception) {

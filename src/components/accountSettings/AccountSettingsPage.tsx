@@ -13,7 +13,7 @@ import {
     Alert,
     IconButton,
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit'; // Import the Edit icon
+import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import useQuery from '../../hooks/useQuery';
 import { ENDPOINTS } from '../../constants/endpoints';
@@ -22,10 +22,11 @@ import Header from '../../components/header/Header';
 import Footer from '../../components/footer/Footer';
 import { HTTP_METHODS } from '../../constants/http';
 import { useUser } from '../../context/UserContext';
+import { ApiResponse, ErrorResponse } from '../../services/apiService';
 
 const AccountSettingsPage: React.FC = () => {
     const navigate = useNavigate();
-    const { logout, updateUser } = useUser();
+    const { user, logout, updateUser } = useUser();
 
     const { data: userInfo, isLoading, getData, sendData } = useQuery<{
         username: string;
@@ -128,12 +129,10 @@ const AccountSettingsPage: React.FC = () => {
     const handleSubmit = () => {
         if (!validateForm()) return;
         if (!hasChanges()) return;
-
         const emailChanged = formData.email !== userInfo?.email;
 
-        sendData(formData, HTTP_METHODS.PUT, ENDPOINTS.USER_UPDATE).then(response => {
-            if (response?.status === 200) {
-                // Update the global user state
+        sendData(formData, HTTP_METHODS.PUT, ENDPOINTS.USER_UPDATE, user?.token).then(response => {
+            if (response && (response as ApiResponse<any>).status === 200) {
                 const updatedData = {
                     username: formData.username,
                     email: formData.email,
@@ -148,13 +147,21 @@ const AccountSettingsPage: React.FC = () => {
                 // Show the Snackbar if email was changed
                 if (emailChanged) {
                     setShowSnackbar(true);
+                    navigate(ROUTE_PATHS.CONFIRMATION_CODE, {
+                        state: {
+                            idToken: user?.idToken,
+                            isEmailUpdate: true,
+                        },
+                    });
                 }
+            } else if (response && (response as ErrorResponse).status) {
+                const errorResponse = response as ErrorResponse;
+                console.error(errorResponse.message);
             }
         });
     };
 
     const handleCancel = () => {
-        // Reset form data to the original user info and disable edit mode
         setFormData({
             username: userInfo?.username || '',
             email: userInfo?.email || '',
@@ -165,10 +172,13 @@ const AccountSettingsPage: React.FC = () => {
     };
 
     const handleDeleteAccount = () => {
-        sendData(undefined, HTTP_METHODS.DELETE, ENDPOINTS.USER_DELETE).then(response => {
-            if (response?.status === 200) {
+        sendData(undefined, HTTP_METHODS.DELETE, ENDPOINTS.USER_DELETE, user?.token).then(response => {
+            if (response && (response as ApiResponse<any>).status === 200) {
                 alert('Your account has been deleted successfully.');
                 logout().then(() => navigate(ROUTE_PATHS.HOME));
+            } else if (response && (response as ErrorResponse).status) {
+                const errorResponse = response as ErrorResponse;
+                console.error(errorResponse.message);
             }
         });
     };
@@ -180,16 +190,14 @@ const AccountSettingsPage: React.FC = () => {
                 maxWidth="sm"
                 sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4, mb: 8 }}
             >
-                {/* Outer Box for overall layout */}
                 <Box
                     sx={{
                         borderRadius: 2,
                         padding: 2,
                         width: '100%',
-                        backgroundColor: 'rgba(255, 255, 255)', // Semi-transparent white background
+                        backgroundColor: 'rgba(255, 255, 255)',
                     }}
                 >
-                    {/* Inner Box for the forms with border */}
                     <Box
                         sx={{
                             padding: 2,
@@ -207,7 +215,7 @@ const AccountSettingsPage: React.FC = () => {
                                     sx={{
                                         position: 'absolute',
                                         top: '2px',
-                                        padding: '1px', // Add padding to move it away from the edges
+                                        padding: '1px',
                                     }}
                                 >
                                     <EditIcon />
@@ -309,18 +317,18 @@ const AccountSettingsPage: React.FC = () => {
                                         mt: 2,
                                         mb: 1,
                                         bgcolor: '#dedede',
-                                        color: 'green', // Green text
+                                        color: 'green',
                                         borderRadius: '5px',
                                         padding: '6px 24px',
                                         width: '140px',
-                                        border: '1px solid green', // Green border
+                                        border: '1px solid green',
                                         '&:hover': {
                                             bgcolor: '#898989',
-                                            border: '1px solid green', // Keep green border on hover
+                                            border: '1px solid green',
                                         },
                                         '&:active': {
                                             bgcolor: '#dedede',
-                                            border: '1px solid green', // Keep green border on active
+                                            border: '1px solid green',
                                         },
                                     }}
                                     onClick={handleSubmit}
@@ -332,7 +340,6 @@ const AccountSettingsPage: React.FC = () => {
                         )}
                     </Box>
 
-                    {/* Conditionally render the Delete Account Button */}
                     {!isEditable && (
                         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <Button
@@ -401,7 +408,6 @@ const AccountSettingsPage: React.FC = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* Snackbar for confirmation code sent */}
             <Snackbar
                 open={showSnackbar}
                 autoHideDuration={6000}

@@ -17,7 +17,8 @@ type RequestParams = {
     httpMethod: string;
     queryParams?: Query;
     body?: any;
-    authToken?: string; // Add authToken to RequestParams
+    authToken?: string;
+    includeTokenInBody?: boolean;
 }
 
 export type ApiResponse<T> = {
@@ -30,9 +31,8 @@ const getErrorMessages = (error: AxiosError): string => {
         return 'Network Error';
     }
 
-    // Extract the detailed error message from the API response if available
     if (error.response.data && typeof error.response.data === 'string') {
-        return error.response.data; // This would be "Error registering user: Already exists"
+        return error.response.data;
     }
 
     return error.message || 'An unknown error occurred';
@@ -41,7 +41,7 @@ const getErrorMessages = (error: AxiosError): string => {
 const createErrorResponse = (error: AxiosError): ErrorResponse => {
     return {
         status: error.response?.status || 500,
-        message: getErrorMessages(error),  // This will include the detailed message
+        message: getErrorMessages(error),
         exception: error
     };
 };
@@ -51,18 +51,28 @@ const makeRequestAsync = async <T>({
     httpMethod,
     queryParams,
     body,
-    authToken,  // Include the authToken parameter
+    authToken,
+    includeTokenInBody = false,
 }: RequestParams): Promise<ApiResponse<T> | ErrorResponse> => {
+
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    };
+
+    if (authToken && !includeTokenInBody) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+    }
+
+    const requestBody = includeTokenInBody
+        ? { ...body, jwtToken: authToken }
+        : body;
 
     const request: AxiosRequestConfig = {
         url,
         method: httpMethod,
         params: queryParams,
-        data: body,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(authToken && { 'Authorization': `Bearer ${authToken}` }),  // Include the token if available
-        },
+        data: requestBody,
+        headers,
     };
 
     try {

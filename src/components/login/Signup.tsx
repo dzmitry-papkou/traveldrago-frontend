@@ -33,7 +33,7 @@ const Signup = () => {
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  const { isLoading, errors: queryErrors, sendData } = useQuery<{ message: string }>({
+  const { isLoading, errors: queryErrors, sendData } = useQuery<{ jwtToken: string }>({
     url: ENDPOINTS.SIGNUP.POST,
   });
 
@@ -118,8 +118,9 @@ const Signup = () => {
         email,
         password,
       }).then((response) => {
-        if (response && response.status === 200) {
-          navigate(ROUTE_PATHS.CONFIRMATION_CODE, { state: { username } });
+        if (response && 'data' in response && response.status === 200) {
+          // Navigate to confirmation code page with jwtToken and username in state
+          navigate(ROUTE_PATHS.CONFIRMATION_CODE, { state: { jwtToken: response.data.jwtToken, username } });
         } else if (response && 'message' in response) {
           setFormError(response.message);
         }
@@ -138,8 +139,8 @@ const Signup = () => {
           alignItems: 'center',
           justifyContent: 'center',
           minHeight: '100vh',
-          pb: 4, // Added padding-bottom here
-          pt: 4
+          pb: 4, 
+          pt: 4,
         }}
       >
         <Box sx={{ bgcolor: 'background.paper', boxShadow: 3, borderRadius: 2, p: 3, width: '100%' }}>

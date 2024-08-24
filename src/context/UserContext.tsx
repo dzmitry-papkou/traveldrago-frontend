@@ -6,6 +6,7 @@ interface User {
     username: string;
     email: string; // Add email to the User interface
     token: string;
+    idToken: string; // Add idToken here
 }
 
 interface UserContextType {

@@ -15,6 +15,9 @@ export const ENDPOINTS = {
   VERIFY_CODE: {
     POST: `${BASE_URL}/confirm`
   },
+  VERIFY_EMAIL_CODE: {
+    POST: `${BASE_URL}/me/verify-email`, // Endpoint for verifying email after update
+  },
   USER_INFO: `${BASE_URL}/me`, // Endpoint to get current user details
   USER_UPDATE: `${BASE_URL}/me/update`, // Endpoint to update current user details
   USER_DELETE: `${BASE_URL}/me/delete`, // Endpoint to delete current user account
