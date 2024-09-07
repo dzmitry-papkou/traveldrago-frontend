@@ -10,7 +10,9 @@ const Login = lazy(() => import('../login/Login'));
 const Signup = lazy(() => import('../login/Signup'));
 const ConfirmationCodePage = lazy(() => import('../confirmation/ConfirmationCodePage'));
 const AccountSettingsPage = lazy(() => import('../accountSettings/AccountSettingsPage'));
+const EventDetailsPage = lazy(() => import('../../pages/events/EventDetailsPage'));
 const ErrorPage = lazy(() => import('..//error/ErrorPage')); // Lazy load the ErrorPage
+const CreateEventForm = lazy(() => import('../createEvent/CreateEventForm')); // Lazy load the create event form
 
 const CustomRouterProvider: FC = () => {
   const router = createBrowserRouter([
@@ -67,6 +69,22 @@ const CustomRouterProvider: FC = () => {
       element: (
         <Suspense fallback={<Loader />}>
           <AccountSettingsPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: ROUTE_PATHS.EVENT_DETAILS, // Add the new route for event details
+      element: (
+        <Suspense fallback={<Loader />}>
+          <EventDetailsPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: ROUTE_PATHS.CREATE_EVENT, // New route for event creation
+      element: (
+        <Suspense fallback={<Loader />}>
+          <CreateEventForm />
         </Suspense>
       ),
     },

@@ -10,7 +10,7 @@ const TicketInfoPage = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header title="Travel6 Drago" />
+      <Header title="Travel Drago" />
       {tickets && <TicketsLeftDisplay tickets={tickets} />}
       <Footer />
     </div>

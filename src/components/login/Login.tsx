@@ -86,7 +86,7 @@ const Login: React.FC = () => {
 
   return (
     <>
-      <Header title="Travel6 Drago" />
+      <Header title="Travel Drago" />
       <Container maxWidth="xs" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh', justifyContent: 'center' }}>
         <Box sx={{ bgcolor: 'background.paper', boxShadow: 3, borderRadius: 2, p: 3, width: '100%' }}>
           <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
@@ -125,13 +125,15 @@ const Login: React.FC = () => {
           </Button>
           {errorMessage && <Typography color="error" sx={{ mt: 2 }}>{errorMessage}</Typography>}
           <Typography component="p" variant="body2" sx={{ textAlign: 'center', mt: 2 }}>
-            or
+            Don't have an account? 
           </Typography>
-          <Button variant="contained" sx={{ mt: 1, bgcolor: '#4267b2' }} fullWidth>
-            Log in with Facebook
-          </Button>
-          <Button variant="contained" sx={{ mt: 1, bgcolor: '#db4437' }} fullWidth>
-            Log in with Google
+          <Button
+            variant="outlined"
+            fullWidth
+            onClick={() => navigate('/signup')} // Navigate to signup page
+            sx={{ mt: 1 }}
+          >
+            Register
           </Button>
         </Box>
       </Container>

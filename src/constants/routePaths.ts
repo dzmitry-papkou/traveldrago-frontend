@@ -6,5 +6,7 @@ export const ROUTE_PATHS = {
     SIGNUP: '/signup',
     TICKET_INFO: '/trip',
     CONFIRMATION_CODE: '/confirmation-code',
-    ACCOUNT_SETTINGS: '/account-settings'
+    ACCOUNT_SETTINGS: '/account-settings',
+    EVENT_DETAILS: '/event/:id', // Add this for the event details route
+    CREATE_EVENT: '/create-event', // Add this route for event creation
 }

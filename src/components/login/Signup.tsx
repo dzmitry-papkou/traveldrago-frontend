@@ -130,7 +130,7 @@ const Signup = () => {
 
   return (
     <>
-      <Header title="Travel6 Drago" />
+      <Header title="Travel Drago" />
       <Container
         maxWidth="xs"
         sx={{

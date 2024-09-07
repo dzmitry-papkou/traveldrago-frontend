@@ -1,126 +1,122 @@
-import React, { useState } from 'react';
-import { Container, Checkbox, FormControlLabel, Button, Typography, TextField } from '@mui/material';
-import Autocomplete from '@mui/material/Autocomplete';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { format } from 'date-fns';
-import TicketsLeftDisplay from '../tickets/TicketsLeftDisplay'; // Retain the import for local display option
-import { filterTickets } from '../../utils/filterTickets'; // Assuming you have this function to filter tickets based on logic
+import React, { useEffect, useState } from 'react';
+import { Container, CircularProgress, Typography, Card, CardContent, Grid, Box, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Import the hook for navigation
+import apiService from '../../services/apiService';
+import { ENDPOINTS } from '../../constants/endpoints';
+import { ROUTE_PATHS } from '../../constants/routePaths'; // Import the route paths
 
-const MainSection = () => {
-  const [isAnywhere, setIsAnywhere] = useState(false);
-  const [isRoundTrip, setIsRoundTrip] = useState(true);
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [fromCity, setFromCity] = useState('');
-  const [toCity, setToCity] = useState('');
-  const [includeCities, setIncludeCities] = useState<string[]>([]);
-  const [excludeCities, setExcludeCities] = useState<string[]>([]);
-  const [ticketsData, setTicketsData] = useState<{ id: number; title: string; description: string; startCity: string; endCity: string; startDate: string; endDate: string; duration: string; }[]>([]);
+// Define the type for the event data
+type Event = {
+  id: string;
+  name: string;
+  description: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  locationName: string;
+  price: number;
+  capacity: number;
+  status: string;
+  isPrivate: boolean;
+};
 
-  const cityOptions: string[] = ['Paris', 'Berlin', 'Rome', 'Amsterdam', 'New York', 'London', 'Tokyo'];
+const MainSection: React.FC = () => {
+  const [publicEvents, setPublicEvents] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleDateChange = ([start, end]: [Date | null, Date | null]) => {
-    setStartDate(start || undefined);
-    setEndDate(end || undefined);
-    setShowDatePicker(false);
+  const navigate = useNavigate(); // Hook to programmatically navigate
+
+  useEffect(() => {
+    const fetchPublicEvents = async () => {
+      try {
+        setIsLoading(true);
+        const response = await apiService.makeRequestAsync<Event[]>({
+          url: ENDPOINTS.EVENTS.PUBLIC_EVENTS,
+          httpMethod: 'GET',
+        });
+        if ('data' in response) {
+          setPublicEvents(response.data); // Now TypeScript knows response.data is an array of Event
+        } else {
+          setError(response.message);
+        }
+      } catch (err) {
+        setError('Failed to fetch public events');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPublicEvents();
+  }, []);
+
+  const handleViewDetails = (eventId: string) => {
+    navigate(ROUTE_PATHS.EVENT_DETAILS.replace(':id', eventId)); // Use the dynamic route
   };
 
-  const handleDesignAdventure = () => {
-    if (startDate && endDate) {
-      const data = filterTickets(fromCity, includeCities, excludeCities, isRoundTrip, toCity);
-      setTicketsData(data);
-    }
-  };
+  if (isLoading) {
+    return (
+      <Container component="main" maxWidth="md" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
-  const filterOptions = (options: string[], exclude: string[]): string[] => {
-    return options.filter(option => !exclude.includes(option));
-  };
+  if (error) {
+    return (
+      <Container component="main" maxWidth="md" sx={{ mt: 4 }}>
+        <Typography variant="h6" color="error">{error}</Typography>
+      </Container>
+    );
+  }
 
   return (
-    <>
-      {/* Main Form Section */}
-      <Container component="main" maxWidth="sm" sx={{ width: "540px", mt: 2, mb: 2, bgcolor: 'background.paper', boxShadow: 3, p: 3, borderRadius: 2 }}>
-        <Typography variant="h5" gutterBottom>Booking Eurotrips made easy</Typography>
-        <Typography variant="subtitle1" gutterBottom>Multi-city travel around Europe</Typography>
-        <Autocomplete
-          value={fromCity}
-          onChange={(event, newValue) => setFromCity(newValue || '')}
-          options={filterOptions(cityOptions, [toCity, ...includeCities, ...excludeCities])}
-          renderInput={(params) => <TextField {...params} label="From" variant="outlined" margin="normal" />}
-          fullWidth
-        />
-        {!isRoundTrip && (
-          <Autocomplete
-            value={toCity}
-            onChange={(event, newValue) => setToCity(newValue || '')}
-            options={filterOptions(cityOptions, [fromCity, ...includeCities, ...excludeCities])}
-            renderInput={(params) => <TextField {...params} label="To" variant="outlined" margin="normal" />}
-            fullWidth
-          />
-        )}
-        <Button onClick={() => setShowDatePicker(!showDatePicker)} variant="outlined" sx={{ mt: 2, mb: 2 }}>
-          Choose Dates
-        </Button>
-        {startDate && endDate && (
-          <Typography variant="body1" sx={{ mt: 1 }}>
-            {`${format(startDate, 'MMM dd, yyyy')} - ${format(endDate, 'MMM dd, yyyy')}`}
-          </Typography>
-        )}
-        {showDatePicker && (
-          <div style={{ position: 'relative', overflow: 'hidden', maxWidth: '100%' }}>
-            <DatePicker
-              selected={startDate}
-              onChange={handleDateChange}
-              startDate={startDate}
-              endDate={endDate}
-              selectsRange
-              inline
-              monthsShown={2}
-              minDate={new Date()}
-              maxDate={new Date(new Date().setMonth(new Date().getMonth() + 6))}
-            />
-          </div>
-        )}
-        <FormControlLabel
-          control={<Checkbox checked={isAnywhere} onChange={() => setIsAnywhere(!isAnywhere)} />}
-          label="Anywhere"
-          sx={{ display: 'block', mt: 2 }}
-        />
-        <Autocomplete
-          multiple
-          options={filterOptions(cityOptions, [fromCity, toCity, ...excludeCities])}
-          value={includeCities}
-          onChange={(event, newValue) => setIncludeCities(newValue || [])}
-          renderInput={(params) => <TextField {...params} label="Include Cities" />}
-          sx={{ mt: 2 }}
-        />
-        <Autocomplete
-          multiple
-          options={filterOptions(cityOptions, [fromCity, toCity, ...includeCities])}
-          value={excludeCities}
-          onChange={(event, newValue) => setExcludeCities(newValue || [])}
-          renderInput={(params) => <TextField {...params} label="Exclude Cities" />}
-          sx={{ mt: 2 }}
-        />
-        <FormControlLabel
-          control={<Checkbox checked={isRoundTrip} onChange={(e) => setIsRoundTrip(e.target.checked)} />}
-          label="Round Trip"
-          sx={{ display: 'block', mt: 1 }}
-        />
-        <Button onClick={handleDesignAdventure} variant="contained" color="primary" fullWidth sx={{ mt: 3, bgcolor: '#28a745' }}>
-          DESIGN ADVENTURE
-        </Button>
-      </Container>
-
-      {/* Ticket Details Section */}
-      {ticketsData.length > 0 && (
-        <Container maxWidth="md" sx={{ width: "100%", maxWidth: "840px", mt: 2, mb: 6 }}>
-          <TicketsLeftDisplay tickets={ticketsData} />
-        </Container>
-      )}
-    </>
+    <Container component="main" maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        align="center"
+        sx={{ color: '#2e7d32', backgroundColor: '#f0f0f0', padding: '8px', borderRadius: '8px' }} // Added background, padding, and border radius
+      >
+        Public Events
+      </Typography>
+      <Grid container spacing={3}>
+        {publicEvents.map((event) => (
+          <Grid item xs={12} sm={6} md={4} key={event.id}>
+            <Card elevation={3} sx={{ borderRadius: 2, backgroundColor: '#f5f5f5', height: '100%' }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  {event.name}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {new Date(event.date).toLocaleDateString()} - {event.startTime} to {event.endTime}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                  Location: {event.locationName}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  Price: ${event.price.toFixed(2)}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Capacity: {event.capacity} people
+                </Typography>
+                <Typography variant="body2" color={event.isPrivate ? 'error' : 'primary'} gutterBottom>
+                  {event.isPrivate ? 'Private' : 'Public'} Event
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={() => handleViewDetails(event.id)} // Handle the view details button
+                  >
+                    View Details
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
   );
 };
 

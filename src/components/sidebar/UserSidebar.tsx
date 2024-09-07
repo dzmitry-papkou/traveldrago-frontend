@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Drawer, List, ListItem, Divider, Typography, Box, Button, ListItemIcon, Dialog, DialogTitle, DialogActions } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import AddIcon from '@mui/icons-material/Add';
 import SupportIcon from '@mui/icons-material/Support';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -53,6 +54,12 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ open, onClose }) => {
 
   const handleLogoutCancel = () => {
     setLogoutDialogOpen(false);
+  };
+
+  // Function to navigate to the event creation page
+  const handleCreateEventClick = () => {
+    navigate(ROUTE_PATHS.CREATE_EVENT);
+    onClose();
   };
 
   return (
@@ -118,6 +125,29 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ open, onClose }) => {
                   Saved Trips
                 </Button>
               </ListItem>
+
+              <ListItem disablePadding>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  startIcon={<AddIcon />}
+                  sx={{
+                    mb: 1,
+                    bgcolor: '#5a5a5a',
+                    justifyContent: 'flex-start',
+                    textAlign: 'left',
+                    padding: '6px 12px',
+                    fontSize: '0.875rem',
+                    '&:hover': {
+                      bgcolor: '#494949',
+                    },
+                  }}
+                  onClick={handleCreateEventClick}
+                >
+                  Create Event
+                </Button>
+              </ListItem>
+
               <ListItem disablePadding>
                 <Button
                   variant="contained"
@@ -182,6 +212,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ open, onClose }) => {
             </List>
           </Box>
 
+          {/* Logout Section */}
           <List>
             <ListItem
               button
