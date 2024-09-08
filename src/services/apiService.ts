@@ -95,10 +95,21 @@ const loginUser = async (username: string, password: string): Promise<ApiRespons
     });
 };
 
+
+  
+  export const deleteEvent = async (eventId: string, token: string) => {
+    return await makeRequestAsync({
+      url: `${ENDPOINTS.EVENTS.DELETE(eventId)}`,
+      httpMethod: 'DELETE',
+      authToken: token
+    });
+  };
+
 const apiService = {
     createErrorResponse,
     makeRequestAsync,
-    loginUser, // Expose the loginUser function
+    loginUser,
+    deleteEvent,
 };
 
 export default apiService;

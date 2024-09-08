@@ -33,5 +33,8 @@ export const ENDPOINTS = {
     ACCEPT_INVITATION: `${BASE_URL}/invitations/accept`, // Accept event invitation
     REJECT_INVITATION: `${BASE_URL}/invitations/reject`, // Reject event invitation
     GET_USER_INVITATIONS: `${BASE_URL}/invitations`, // Get invitations for the user
+    REGISTER: (eventId: string) => `${BASE_URL}/events/${eventId}/register`, // Register for an event
+    UNREGISTER: (eventId: string) => `${BASE_URL}/events/${eventId}/unregister`, // Unregister from an event
+    MY_REGISTRATIONS: `${BASE_URL}/my-registrations`,
   },
 };

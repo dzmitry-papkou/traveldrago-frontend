@@ -13,6 +13,8 @@ const AccountSettingsPage = lazy(() => import('../accountSettings/AccountSetting
 const EventDetailsPage = lazy(() => import('../../pages/events/EventDetailsPage'));
 const ErrorPage = lazy(() => import('..//error/ErrorPage')); // Lazy load the ErrorPage
 const CreateEventForm = lazy(() => import('../createEvent/CreateEventForm')); // Lazy load the create event form
+const YourEvents = lazy(() => import('../../pages/events/YourEvents')); // Import YourEventsPage
+const EditEventPage = lazy(() => import('../../pages/events/EditEventPage')); // Lazy load the EditEventPage
 
 const CustomRouterProvider: FC = () => {
   const router = createBrowserRouter([
@@ -88,6 +90,25 @@ const CustomRouterProvider: FC = () => {
         </Suspense>
       ),
     },
+
+    {
+      path: ROUTE_PATHS.YOUR_EVENTS, // Add the route for Your Events
+      element: (
+        <Suspense fallback={<Loader />}>
+          <YourEvents />
+        </Suspense>
+      ),
+    },
+
+    {
+      path: ROUTE_PATHS.EDIT_EVENT, // Edit event route
+      element: (
+        <Suspense fallback={<Loader />}>
+          <EditEventPage />
+        </Suspense>
+      ),
+    },
+
     {
       path: '*', // Catch-all route
       element: (

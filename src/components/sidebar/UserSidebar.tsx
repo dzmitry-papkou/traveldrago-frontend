@@ -105,26 +105,30 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ open, onClose }) => {
             </Box>
             <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.12)' }} />
             <List>
-              <ListItem disablePadding>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  startIcon={<FavoriteIcon />}
-                  sx={{
-                    mb: 1,
-                    bgcolor: '#5a5a5a',
-                    justifyContent: 'flex-start',
-                    textAlign: 'left',
-                    padding: '6px 12px',
-                    fontSize: '0.875rem',
-                    '&:hover': {
-                      bgcolor: '#494949',
-                    },
-                  }}
-                >
-                  Saved Trips
-                </Button>
-              </ListItem>
+            <ListItem disablePadding>
+              <Button
+                variant="contained"
+                fullWidth
+                startIcon={<FavoriteIcon />} // You can change this icon if you prefer
+                sx={{
+                  mb: 1,
+                  bgcolor: '#5a5a5a',
+                  justifyContent: 'flex-start',
+                  textAlign: 'left',
+                  padding: '6px 12px',
+                  fontSize: '0.875rem',
+                  '&:hover': {
+                    bgcolor: '#494949',
+                  },
+                }}
+                onClick={() => {
+                  navigate(ROUTE_PATHS.YOUR_EVENTS); // Navigate to the 'Your Events' page
+                  onClose(); // Close the sidebar
+                }}
+              >
+                Your Events
+              </Button>
+            </ListItem>
 
               <ListItem disablePadding>
                 <Button
