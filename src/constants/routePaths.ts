@@ -1,0 +1,18 @@
+export const ROUTE_PATHS = {
+  HOME: '/',
+  GALLERY: '/gallery',
+  ECHO: '/echo',
+  LOGIN: '/login',
+  SIGNUP: '/signup',
+  TICKET_INFO: '/trip',
+  CONFIRMATION_CODE: '/confirmation-code',
+  ACCOUNT_SETTINGS: '/account-settings',
+  EVENT_DETAILS: '/events/:id',
+  CATEGORY_EVENTS: '/categories/:name/events',
+  CREATE_EVENT: '/create-event',
+  YOUR_EVENTS: '/your-events',
+  EDIT_EVENT: '/events/edit/:id',
+  PAYMENT: '/payment/:id',
+  TERMS: '/terms',
+  PRIVACY: '/privacy',
+};

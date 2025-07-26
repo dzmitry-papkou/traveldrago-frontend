@@ -1,0 +1,46 @@
+/* Adjust the width of the autocomplete suggestions container */
+.pac-container {
+  width: 250px !important;
+}
+
+/* Style the suggestion items */
+.pac-item {
+  padding: 5px !important;
+  font-size: 13px;
+}
+
+/* Style the suggestion text */
+.pac-item .pac-item-query {
+  font-size: 13px;
+}
+
+/* Adjust the icon size */
+.pac-icon {
+  height: 20px !important;
+  width: 20px !important;
+}
+
+/* Optional: Limit the height and enable scrolling */
+.pac-container {
+  max-height: 150px !important;
+  overflow-y: auto !important;
+}
+
+.pac-item.pac-logo {
+  padding: 1px !important;
+  font-size: 1px !important;
+  line-height: 1 !important;
+}
+
+.pac-container:after {
+  background-image: none !important;
+  height: 0px;
+}
+
+.mapboxgl-ctrl-logo {
+  display: none !important;
+}
+
+.mapboxgl-ctrl-attrib {
+  display: none !important;
+}
